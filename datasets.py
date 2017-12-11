@@ -31,7 +31,7 @@ class YelpReviews(Dataset):
         for i, j in enumerate(features):
             line_array[i,j] = 1
         keys = ["stars", "useful", "cool", "funny"]
-        targets = np.array([float(data[i]) for i in keys])
+        targets = np.array([float(data[i]) for i in keys], dtype='float32')
 
         return (torch.from_numpy(line_array), torch.from_numpy(targets))
         
