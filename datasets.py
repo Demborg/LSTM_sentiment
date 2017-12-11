@@ -1,6 +1,8 @@
 import torch
 import json
 import sys
+import linecache
+import numpy as np
 
 from torch.utils.data import Dataset
 
@@ -12,13 +14,32 @@ class YelpReviews(Dataset):
         with open(path) as f:
             for line in f:
                 self.len += 1
+        linecache.lazycache(path, None)
         print("Dataset: Is ready!")
 
     def __len__(self):
         return self.len
 
+    def __getitem__(self, item):
+        if item < 0 or item >= self.len:
+            raise IndexError("plz only positve and nice indices")
+        line = linecache.getline(self.file, item + 1)
+        data = json.loads(line)
+        features = data["text"]
+        features = [ord(c) for c in features]
+        line_array = np.zeros([len(features), 256], dtype="float32")
+        for i, j in enumerate(features):
+            line_array[i,j] = 1
+        keys = ["stars", "useful", "cool", "funny"]
+        targets = np.array([float(data[i]) for i in keys])
+
+        return (torch.from_numpy(line_array), torch.from_numpy(targets))
+        
+
+
 if __name__ == "__main__":
     dataset = YelpReviews(sys.argv[1])
     print(len(dataset))
+    print(dataset[1])
                 
 
