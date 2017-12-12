@@ -56,7 +56,7 @@ for epoch in range(settings.EPOCHS):
         # Progress update
         if i % 10 == 0:
             sys.stdout.write("\rIter {}/{}, loss: {}".format(i, length, float(loss)))
-    print("Epoch finished with last loss: {}".format(loss))
+    print("Epoch finished with last loss: {}".format(float(loss)))
 
     # Visualize distribution and save model checkpoint
     viz.histogram(win=dist_hist, X=stars, opts=dict(numbins=20))
