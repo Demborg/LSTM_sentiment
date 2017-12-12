@@ -2,13 +2,13 @@ import sys
 
 import torch
 from torch.utils.data import DataLoader
+from torch.autograd import Variable
 import numpy as np
 
 import datasets
 import settings
 import models
 import utils
-from torch.autograd import Variable
 
 """Evaluates a model on a given dataset
 takes two command line parameters, path to saved model and path to dataset"""
