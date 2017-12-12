@@ -5,11 +5,18 @@ from datasets import YelpReviews
 import settings 
 import models
 from torch.autograd import Variable
+from visdom import Visdom
 
+# Instansiate dataset
 dataset = YelpReviews(settings.DATAFILE)
+
+# Define model and optimizer
 # model = models.BaselineModel(settings.HIDDEN_SIZE)
 model = models.SimpleLSTM(settings.HIDDEN_SIZE)
 optimizer = torch.optim.Adam(model.parameters(), lr=settings.LEARNING_RATE)
+
+# Visualization thorugh visdom
+
 
 data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
 for epoch in range(settings.EPOCHS):
