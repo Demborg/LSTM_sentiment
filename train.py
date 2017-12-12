@@ -58,7 +58,7 @@ for epoch in range(settings.EPOCHS):
 
     # Visualize distribution and save model checkpoint
     viz.histogram(win=dist_hist, X=stars, opts=dict(numbins=20))
-    name = "test_save_epoch{}.params".format(epoch)
+    name = "{}_epoch{}.params".format(model.get_name(), epoch)
     utils.save_model_params(model, name)
     print("Saved model params as: {}".format(name))
 
