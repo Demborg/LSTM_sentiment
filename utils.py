@@ -15,5 +15,5 @@ def save_model_params(model, name):
 
 def load_model_params(model, name):
     """ Loads parameters for specified model. Analogous to save_model_params() """
-    path = os.path.join(os.getcwd(), settings.CHECKPOINT_DIR, name)
+    path = os.path.join(os.getcwd(), name)
     model.load_state_dict(torch.load(path))
