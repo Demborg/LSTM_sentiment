@@ -1,6 +1,6 @@
 import torch
 
-EPOCHS = 40
+EPOCHS = 30
 DATAFILE = "small_data.json"
 LEARNING_RATE = 0.001  
 GPU = torch.cuda.is_available()

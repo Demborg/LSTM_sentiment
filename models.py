@@ -13,8 +13,8 @@ class BaselineModel(nn.Module):
 
     def forward(self, sequence):
         output, hn = self.rnn(sequence, self.h0)
-        predictions = self.output_layer(hn)
-        return F.relu(predictions)
+        predictions = self.output_layer(output)
+        return predictions
         
 
 
