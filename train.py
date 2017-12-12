@@ -7,7 +7,8 @@ import models
 from torch.autograd import Variable
 
 dataset = YelpReviews(settings.DATAFILE)
-model = models.BaselineModel()
+# model = models.BaselineModel(settings.HIDDEN_SIZE)
+model = models.SimpleLSTM(settings.HIDDEN_SIZE)
 optimizer = torch.optim.Adam(model.parameters(), lr=settings.LEARNING_RATE)
 
 data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
@@ -20,7 +21,7 @@ for epoch in range(settings.EPOCHS):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        #print("Label: {}".format(target))
-        #print("Prediction: {}".format(out))
+        print("Label: {}".format(target))
+        print("Prediction: {}".format(out[-1]))
         print("Loss: {}".format(loss))
 	  
