@@ -1,7 +1,7 @@
 import torch
 
 EPOCHS = 300
-DATAFILE = "data/small_data.json"
+DATAFILE = "data/small_data_train.json"
 LEARNING_RATE = 0.001
 GPU = torch.cuda.is_available()
 HIDDEN_SIZE = 100
