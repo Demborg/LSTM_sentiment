@@ -36,6 +36,23 @@ class YelpReviews(Dataset):
         return (torch.from_numpy(line_array), torch.from_numpy(targets))
         
 
+class RandomData(Dataset):
+    """ Random data generator, designed for speed checks """
+
+    def __init__(self, output_len):
+        self.len = 0
+        self.output_len = 0
+        print("Dataset: going through all reviews...")
+        with open(path) as f:
+            for line in f:
+                self.len += 1
+        print("Dataset: Is ready!")
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, item):
+        return (torch.randn(self.output_len, 256), torch.ones(4))
 
 if __name__ == "__main__":
     dataset = YelpReviews(sys.argv[1])
