@@ -24,7 +24,9 @@ optimizer = torch.optim.Adam(model.parameters(), lr=settings.LEARNING_RATE)
 # Visualization thorugh visdom
 viz = Visdom()
 loss_plot = viz.line(X=np.array([0]), Y=np.array([0]))
-dist_hist = viz.histogram(X=np.random.rand(100), opts=dict(numbins=20))
+hist_opts = settings.HIST_OPTS
+hist_opts["title"] = "Predicted star distribution"
+dist_hist = viz.histogram(X=np.random.rand(100), opts=hist_opts)
 
 counter = 0
 for epoch in range(settings.EPOCHS):
