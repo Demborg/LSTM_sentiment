@@ -59,7 +59,7 @@ for epoch in range(settings.EPOCHS):
     print("Epoch finished with last loss: {}".format(float(loss)))
 
     # Visualize distribution and save model checkpoint
-    viz.histogram(win=dist_hist, X=stars, opts=dict(numbins=20))
+    viz.histogram(win=dist_hist, X=stars, opts=hist_opts)
     name = "{}_epoch{}.params".format(model.get_name(), epoch)
     utils.save_model_params(model, name)
     print("Saved model params as: {}".format(name))
