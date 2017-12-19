@@ -1,5 +1,6 @@
 import argparse
 import torch
+import models
 
 # Argument parsing
 parser = argparse.ArgumentParser(description="GPU argument paser")
@@ -9,7 +10,13 @@ args = parser.parse_args()
 EPOCHS = 300
 DATAFILE = "data/small_data_train.json"
 LEARNING_RATE = 0.001
-HIDDEN_SIZE = 100
+GPU = torch.cuda.is_available()
+
+MODEL = {
+    "model": models.SimpleLSTM,
+    "hidden_size": 100,
+}
+
 VISUALIZE = True
 CHECKPOINT_DIR = "checkpoints"
 

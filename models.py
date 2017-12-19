@@ -8,13 +8,17 @@ import settings
 
 class BaselineModel(nn.Module):
 
-    def __init__(self, hidden_size=100):
+    def __init__(self, **kwargs):
+        """
+        Initialize new baseline model.
+        :keyword argument: hidden_size: int, number of hitten units.
+        """
         super().__init__()
-        self.hidden_size = hidden_size
+        self.hidden_size = kwargs["hidden_size"]
 
-        self.rnn = nn.RNN(input_size=256, hidden_size=hidden_size, num_layers=1)
-        self.output_layer = nn.Linear(hidden_size, 4)
-        self.h0 = nn.Parameter(torch.randn(1, 1, hidden_size))
+        self.rnn = nn.RNN(input_size=256, hidden_size=self.hidden_size, num_layers=1)
+        self.output_layer = nn.Linear(self.hidden_size, 4)
+        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
 
     def forward(self, sequence):
         output, hn = self.rnn(sequence, self.h0)
@@ -27,14 +31,18 @@ class BaselineModel(nn.Module):
 
 class SimpleLSTM(nn.Module):
 
-    def __init__(self, hidden_size=100):
+    def __init__(self, **kwargs):
+        """
+        Initialize new SimpleLSTM model.
+        :keyword argument: hidden_size: int, number of hitten units.
+        """
         super().__init__()
-        self.hidden_size = hidden_size
+        self.hidden_size = kwargs["hidden_size"]
 
-        self.lstm = nn.LSTM(input_size=256, hidden_size=hidden_size, num_layers=1)
-        self.output_layer = nn.Linear(hidden_size, 4)
-        self.h0 = nn.Parameter(torch.randn(1, 1, hidden_size))
-        self.c0 = nn.Parameter(torch.randn(1, 1, hidden_size))
+        self.lstm = nn.LSTM(input_size=256, hidden_size=self.hidden_size, num_layers=1)
+        self.output_layer = nn.Linear(self.hidden_size, 4)
+        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
+        self.c0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
 
     def forward(self, sequence):
         output, hn = self.lstm(sequence, (self.h0, self.c0))

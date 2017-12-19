@@ -18,7 +18,7 @@ dataset = datasets.YelpReviews(sys.argv[2])
 data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
 
 # Define model and optimizer
-model = models.SimpleLSTM(settings.HIDDEN_SIZE)
+model = utils.generate_model_from_settings()
 utils.load_model_params(model, sys.argv[1])
 
 
