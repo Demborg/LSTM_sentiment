@@ -28,6 +28,11 @@ hist_opts = settings.HIST_OPTS
 hist_opts["title"] = "Predicted star distribution"
 dist_hist = viz.histogram(X=np.random.rand(100), opts=hist_opts)
 
+# Move stuff to GPU
+if settings.GPU:
+    data_loader.pin_memory = True
+    model.cuda()
+
 counter = 0
 for epoch in range(settings.EPOCHS):
     # Stars for histogram
@@ -37,6 +42,10 @@ for epoch in range(settings.EPOCHS):
     length = len(dataset)
     print("Starting epoch {} with length {}".format(epoch, length))
     for i, (feature, target) in enumerate(data_loader):
+        if settings.GPU:
+            feature = feature.cuda(async=True)
+            target = target.cuda(async=True)
+
         # Inference
         feature = Variable(feature.permute(1, 0, 2))
         target = Variable(target)
@@ -50,7 +59,7 @@ for epoch in range(settings.EPOCHS):
 
         # Visualization update
         stars[i] = out[-1, 0, 0]
-        viz.line(win=loss_plot, X=np.array([counter]), Y=loss.data.numpy(), update='append')
+        viz.line(win=loss_plot, X=np.array([counter]), Y=loss.data.cpu().numpy(), update='append')
         counter += 1
 
         # Progress update
