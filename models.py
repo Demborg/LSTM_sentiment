@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
+import settings
+
 
 class BaselineModel(nn.Module):
 
@@ -16,7 +18,7 @@ class BaselineModel(nn.Module):
 
         self.rnn = nn.RNN(input_size=256, hidden_size=self.hidden_size, num_layers=1)
         self.output_layer = nn.Linear(self.hidden_size, 4)
-        self.h0 = Variable(torch.randn(1, 1, self.hidden_size))
+        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
 
     def forward(self, sequence):
         output, hn = self.rnn(sequence, self.h0)
@@ -39,8 +41,8 @@ class SimpleLSTM(nn.Module):
 
         self.lstm = nn.LSTM(input_size=256, hidden_size=self.hidden_size, num_layers=1)
         self.output_layer = nn.Linear(self.hidden_size, 4)
-        self.h0 = Variable(torch.randn(1, 1, self.hidden_size))
-        self.c0 = Variable(torch.randn(1, 1, self.hidden_size))
+        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
+        self.c0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
 
     def forward(self, sequence):
         output, hn = self.lstm(sequence, (self.h0, self.c0))
