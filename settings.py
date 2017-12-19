@@ -13,8 +13,9 @@ LEARNING_RATE = 0.001
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.SimpleLSTM,
+    "model": models.PureGRU,
     "hidden_size": 100,
+    "num_layers": 1
 }
 
 VISUALIZE = True
