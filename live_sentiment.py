@@ -1,3 +1,7 @@
+"""
+Live sentiment analysis. Example run: `python live_sentiment.py [model path] [input string]`
+"""
+
 import sys
 
 import torch
@@ -29,7 +33,7 @@ def rating_to_color(rating):
 
 if __name__ == "__main__":
     # load model
-    model = models.SimpleLSTM(settings.HIDDEN_SIZE)
+    model = utils.generate_model_from_settings()
     utils.load_model_params(model, sys.argv[1])
 
     #extract features from string
