@@ -51,7 +51,7 @@ class PureGRU(nn.Module):
         return predictions
 
     def get_name(self):
-        return "PureGRU_h:{}_l:{}".format(self.hidden_size, self.num_layers)
+        return "PureGRU_h{}_l{}".format(self.hidden_size, self.num_layers)
 
 class SimpleLSTM(nn.Module):
 
