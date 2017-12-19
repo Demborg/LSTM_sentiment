@@ -14,12 +14,12 @@ import utils
 takes two command line parameters, path to saved model and path to dataset"""
 
 # Instansiate dataset
-dataset = datasets.YelpReviews(sys.argv[2])
+dataset = datasets.YelpReviews(settings.args.data_path)
 data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
 
 # Define model and optimizer
 model = utils.generate_model_from_settings()
-utils.load_model_params(model, sys.argv[1])
+utils.load_model_params(model, settings.args.load_path)
 
 
 losses = np.zeros(len(dataset))

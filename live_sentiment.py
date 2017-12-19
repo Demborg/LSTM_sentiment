@@ -1,17 +1,13 @@
-"""
-Live sentiment analysis. Example run: `python live_sentiment.py [model path] [input string]`
-"""
-
 import sys
 
 import torch
 from torch.autograd import Variable
 import numpy as np
 
-import models
 import utils
 import settings
 from colored import fg, bg, stylize 
+
 
 def get_live_sentiment(model, feature):
     """Takes a trained model and a list of features and returns the
@@ -23,6 +19,7 @@ def get_live_sentiment(model, feature):
 
     return(out)
 
+
 def rating_to_color(rating):
     """Takes a rating from 0 to 5 and converts that to a grey scale x-term
     safe color"""
@@ -31,16 +28,18 @@ def rating_to_color(rating):
     val = max(0, min(255, val))
     return val
 
+
 if __name__ == "__main__":
     # load model
     model = utils.generate_model_from_settings()
-    utils.load_model_params(model, sys.argv[1])
+    utils.load_model_params(model, settings.args.load_path)
 
     #extract features from string
-    features = [ord(c) for c in sys.argv[2]]
+    features = [ord(c) for c in settings.args.text]
     line_array = np.zeros([1, len(features), 256], dtype="float32")
+
     for i, j in enumerate(features):
-        line_array[0,i,j] = 1
+        line_array[0, i, j] = 1
 
     line_array = torch.from_numpy(line_array)
     # print(line_array)
@@ -58,8 +57,8 @@ if __name__ == "__main__":
         print(stylize(i, style), end='')
     print("\nScored sentence:")
 
-    for i, c in enumerate(sys.argv[2]):
-        style = bg(rating_to_color(out[i,0,0])) + font_color
+    for i, c in enumerate(settings.args.text):
+        style = bg(rating_to_color(out[i, 0, 0])) + font_color
 
         print(stylize(c, style), end='')
 

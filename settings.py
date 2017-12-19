@@ -5,6 +5,9 @@ import models
 # Argument parsing
 parser = argparse.ArgumentParser(description="GPU argument paser")
 parser.add_argument('--enable-cuda', action='store_true', help='Enable CUDA')
+parser.add_argument('--load-path', action='store', help='Path to checkpoint file for evaluation.')
+parser.add_argument('--data-path', action='store', help='Path to dataset.')
+parser.add_argument('--text', action='store', help='Text for live evaluation.')
 args = parser.parse_args()
 
 EPOCHS = 300
