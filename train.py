@@ -46,7 +46,7 @@ for epoch in range(settings.EPOCHS):
             target = target.cuda(async=True)
 
         # Inference
-        feature = Variable(feature.permute(1, 0, 2))
+        feature = Variable(feature)
         target = Variable(target)
         out = model(feature)
 

@@ -16,12 +16,13 @@ LEARNING_RATE = 0.001
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.PureGRU,
+    "model": models.EmbeddingLSTM,
+    "embedding_dim": 8,
     "hidden_size": 100,
     "num_layers": 1
 }
 
-DATASET = datasets.YelpReviewsOneHotChars
+DATASET = datasets.YelpReviewsCharIdxes
 
 VISUALIZE = True
 CHECKPOINT_DIR = "checkpoints"

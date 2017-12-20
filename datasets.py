@@ -60,7 +60,7 @@ class YelpReviewsCharIdxes(Dataset):
         line = linecache.getline(self.file, item + 1)
         data = json.loads(line)
         features = data["text"]
-        features = [ord(c) for c in features]
+        features = np.array([ord(c) for c in features], dtype="int64")
         keys = ["stars", "useful", "cool", "funny"]
         targets = np.array([float(data[i]) for i in keys], dtype='float32')
 
