@@ -1,12 +1,12 @@
 from torch.utils.data import DataLoader
-from datasets import YelpReviews
+from datasets import YelpReviewsOneHotChars
 import numpy as np
 import settings
 from visdom import Visdom
 import copy
 
 # Instansiate dataset
-dataset = YelpReviews(settings.DATAFILE)
+dataset = YelpReviewsOneHotChars(settings.DATAFILE)
 data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
 
 # Create visdom instance

@@ -13,7 +13,7 @@ import utils
 
 
 # Instansiate dataset
-dataset = datasets.YelpReviews(settings.DATAFILE)
+dataset = settings.DATASET(settings.args.data_path)
 data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
 
 # Define model and optimizer
@@ -46,7 +46,7 @@ for epoch in range(settings.EPOCHS):
             target = target.cuda(async=True)
 
         # Inference
-        feature = Variable(feature.permute(1, 0, 2))
+        feature = Variable(feature)
         target = Variable(target)
         out = model(feature)
 

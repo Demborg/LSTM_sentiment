@@ -1,6 +1,7 @@
 import argparse
 import torch
 import models
+import datasets
 
 # Argument parsing
 parser = argparse.ArgumentParser(description="Sentiment analysis through Yelp reviews.")
@@ -11,15 +12,17 @@ parser.add_argument('--text', action='store', help='Text for live evaluation.')
 args = parser.parse_args()
 
 EPOCHS = 300
-DATAFILE = "data/small_data_train.json"
 LEARNING_RATE = 0.001
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.PureGRU,
+    "model": models.EmbeddingLSTM,
+    "embedding_dim": 8,
     "hidden_size": 100,
     "num_layers": 1
 }
+
+DATASET = datasets.YelpReviewsCharIdxes
 
 VISUALIZE = True
 CHECKPOINT_DIR = "checkpoints"
