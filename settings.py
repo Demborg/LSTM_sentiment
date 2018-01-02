@@ -11,14 +11,14 @@ parser.add_argument('--data-path', action='store', help='Path to dataset.')
 parser.add_argument('--text', action='store', help='Text for live evaluation.')
 args = parser.parse_args()
 
-EPOCHS = 300
+EPOCHS = 10
 LEARNING_RATE = 0.001
 GPU = torch.cuda.is_available()
 
 MODEL = {
     "model": models.EmbeddingGRU,
-    "embedding_dim": 8,
-    "hidden_size": 100,
+    "embedding_dim": 16,
+    "hidden_size": 256,
     "num_layers": 1,
 }
 
