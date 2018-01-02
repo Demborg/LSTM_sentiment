@@ -172,7 +172,7 @@ class EmbeddingGRU(nn.Module):
         sequence = pack_padded_sequence(embeds, lengths)
         import code
         code.interact(local=locals())
-        output, hn = self.gru(sequence, self.h0)
+        output, hn = self.gru(sequence, self.h0.expand(self.num_layers, len(lengths), self.hidden_size))
         predictions = self.output_layer(hn)
         return predictions
 
