@@ -18,7 +18,7 @@ class FileReader:
 
     def __getitem__(self, item):
         self.mm.seek(self.idxes[item])
-        return self.mm.readline().decode("utf-8")
+        return self.mm.readline().decode("ascii", "ignore")
 
     def __len__(self):
         return len(self.idxes)
