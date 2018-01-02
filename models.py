@@ -111,4 +111,65 @@ class EmbeddingLSTM(nn.Module):
         return predictions
 
     def get_name(self):
-        return "EmbeddingLSTM_h{}_l{}".format(self.hidden_size, self.num_layers)
+        return "EmbeddingLSTM_h{}_l{}_e{}".format(self.hidden_size, self.num_layers, self.embedding_dim)
+
+
+class EmbeddingBaselineModel(nn.Module):
+
+    def __init__(self, **kwargs):
+        """
+        Initialize new baseline model.
+        :keyword argument: hidden_size: int, number of hitten units.
+        :keyword num_layers: number of LSTM layers.
+        :keyword embedding_dim: Dimensionality of the embeddings.
+        """
+        super().__init__()
+        self.hidden_size = kwargs["hidden_size"]
+        self.num_layers = kwargs["num_layers"]
+        self.embedding_dim = kwargs["embedding_dim"]
+
+        self.char_embeddings = nn.Embedding(256, self.embedding_dim)
+        self.rnn = nn.RNN(input_size=self.embedding_dim, hidden_size=self.hidden_size, num_layers=self.num_layers)
+        self.output_layer = nn.Linear(self.hidden_size, 4)
+        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
+
+    def forward(self, sequence):
+        embeds = self.char_embeddings(sequence)
+        sequence = embeds.permute(1, 0, 2)
+        output, hn = self.rnn(sequence, self.h0)
+        predictions = self.output_layer(output)
+        return predictions
+
+    def get_name(self):
+        return "EmbeddingBaseLine_h{}_l{}_e{}".format(self.hidden_size, self.num_layers, self.embedding_dim)
+
+
+class EmbeddingGRU(nn.Module):
+
+    def __init__(self, **kwargs):
+        """
+        Initialize new PureGRU model.
+        :keyword arguments:
+        hidden_size: int, number of hitten units.
+        num_layers: int, Number of recurrent layers
+        :keyword embedding_dim: Dimensionality of the embeddings.
+        """
+        super().__init__()
+        self.hidden_size = kwargs["hidden_size"]
+        self.num_layers = kwargs["num_layers"]
+        self.embedding_dim = kwargs["embedding_dim"]
+
+        self.char_embeddings = nn.Embedding(256, self.embedding_dim)
+        self.gru = nn.GRU(input_size=self.embedding_dim, hidden_size=self.hidden_size, num_layers=self.num_layers)
+        self.output_layer = nn.Linear(self.hidden_size, 4)
+        self.h0 = nn.Parameter(torch.randn(self.num_layers, 1, self.hidden_size))
+
+    def forward(self, sequence):
+        embeds = self.char_embeddings(sequence)
+        sequence = embeds.permute(1, 0, 2)
+        output, hn = self.gru(sequence, self.h0)
+        predictions = self.output_layer(output)
+        return predictions
+
+    def get_name(self):
+        return "EmbeddingGRU_h{}_l{}_e{}".format(self.hidden_size, self.num_layers, self.embedding_dim)
