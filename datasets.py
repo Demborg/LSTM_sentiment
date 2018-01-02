@@ -62,8 +62,6 @@ class RandomData(Dataset):
                 self.len += 1
         print("Dataset: Is ready!")
 
-        self.file = IndexedOpen(path)
-
     def __len__(self):
         return self.len
 
