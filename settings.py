@@ -13,7 +13,7 @@ args = parser.parse_args()
 
 EPOCHS = 10
 LEARNING_RATE = 0.001
-BATCH_SIZE = 5
+BATCH_SIZE = 10
 GPU = torch.cuda.is_available()
 
 MODEL = {

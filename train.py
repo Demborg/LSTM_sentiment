@@ -20,8 +20,9 @@ def my_collate(batch):
     targets = torch.stack([i[1] for i in batch])
 
     features = utils.pack_sequence(features)
+    features, lengths = torch.nn.utils.rnn.pad_packed_sequence(features, padding_value=0)
 
-    return features, targets
+    return features, lengths, targets
 
 
 
@@ -53,12 +54,12 @@ for epoch in range(settings.EPOCHS):
     # Main epoch loop
     length = len(dataset)/settings.BATCH_SIZE
     print("Starting epoch {} with length {}".format(epoch, length))
-    for i, (feature, target) in enumerate(data_loader):
+    for i, (feature, lengths, target) in enumerate(data_loader):
         if settings.GPU:
             feature = feature.cuda(async=True)
             target = target.cuda(async=True)
 
-        out = model(feature)
+        out = model(feature, lengths)
 
         # Loss computation and weight update step
         loss = torch.mean((out - target)**2)

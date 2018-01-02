@@ -166,10 +166,12 @@ class EmbeddingGRU(nn.Module):
         self.output_layer = nn.Linear(self.hidden_size, 4)
         self.h0 = nn.Parameter(torch.randn(self.num_layers, 1, self.hidden_size))
 
-    def forward(self, sequence):
-        padded, lengths = pad_packed_sequence(sequence, padding_value=0)
+    def forward(self, padded, lengths):
+        #padded, lengths = pad_packed_sequence(sequence, padding_value=0)
         embeds = self.char_embeddings(padded)
         sequence = pack_padded_sequence(embeds, lengths)
+        import code
+        code.interact(local=locals())
         output, hn = self.gru(sequence, self.h0)
         predictions = self.output_layer(hn)
         return predictions
