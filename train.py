@@ -68,7 +68,7 @@ for epoch in range(settings.EPOCHS):
         optimizer.step()
 
         # Visualization update
-        stars[i] = out[-1, 0, 0]
+        stars[i] = torch.mean(out[0, :, 0])
         viz.line(win=loss_plot, X=np.array([counter]), Y=loss.data.cpu().numpy(), update='append')
         counter += 1
 
