@@ -2,24 +2,29 @@ import torch
 import json
 import sys
 import numpy as np
-from randomlineaccess import IndexedOpen
+import linecache
 
 from torch.utils.data import Dataset
 
 
 class YelpReviewsOneHotChars(Dataset):
     def __init__(self, path):
+        self.path = path
+        self.len = 0
+
         print("Indexing dataset...")
-        self.file = IndexedOpen(path)
+        with open(path) as f:
+            for _ in f.readlines():
+                self.len += 1
         print("Indexing finished!")
 
     def __len__(self):
-        return len(self.file)
+        return self.len
 
     def __getitem__(self, item):
-        if item < 0 or item >= len(self.file):
+        if item < 0 or item >= self.len:
             raise IndexError("plz only positve and nice indices")
-        line = self.file[item]
+        line = linecache.getline(self.path, item - 1)
         data = json.loads(line)
         features = data["text"]
         features = [ord(c) for c in features]
@@ -37,18 +42,28 @@ class YelpReviewsCharIdxes(Dataset):
     Should be used together with models that learn their own embeddings.
     """
     def __init__(self, path):
+        self.path = path
+        self.len = 0
+
         print("Indexing dataset...")
-        self.file = IndexedOpen(path)
+        with open(path) as f:
+            for _ in f.readlines():
+                self.len += 1
         print("Indexing finished!")
 
     def __len__(self):
-        return len(self.file)
+        return self.len
 
     def __getitem__(self, item):
-        if item < 0 or item >= len(self.file):
+        if item < 0 or item >= self.len:
             raise IndexError("plz only positve and nice indices")
-        line = self.file[item]
-        data = json.loads(line)
+        line = linecache.getline(self.path, item + 1)
+        try:
+            data = json.loads(line)
+        except Exception:
+            print("Aha------")
+            print(line)
+            print("--------")
         features = data["text"]
         features = np.array([ord(c) for c in features], dtype="int64")
         keys = ["stars", "useful", "cool", "funny"]
