@@ -2,24 +2,20 @@ import torch
 import json
 import sys
 import numpy as np
-from randomlineaccess import IndexedOpen
+import filereader
 
 from torch.utils.data import Dataset
 
 
 class YelpReviewsOneHotChars(Dataset):
     def __init__(self, path):
-        print("Indexing dataset...")
-        self.file = IndexedOpen(path)
-        print("Indexing finished!")
+        self.reader = filereader.FileReader(path)
 
     def __len__(self):
-        return len(self.file)
+        return len(self.reader)
 
     def __getitem__(self, item):
-        if item < 0 or item >= len(self.file):
-            raise IndexError("plz only positve and nice indices")
-        line = self.file[item]
+        line = self.reader[item]
         data = json.loads(line)
         features = data["text"]
         features = [ord(c) for c in features]
@@ -37,17 +33,13 @@ class YelpReviewsCharIdxes(Dataset):
     Should be used together with models that learn their own embeddings.
     """
     def __init__(self, path):
-        print("Indexing dataset...")
-        self.file = IndexedOpen(path)
-        print("Indexing finished!")
+        self.reader = filereader.FileReader(path)
 
     def __len__(self):
-        return len(self.file)
+        return len(self.reader)
 
     def __getitem__(self, item):
-        if item < 0 or item >= len(self.file):
-            raise IndexError("plz only positve and nice indices")
-        line = self.file[item]
+        line = self.reader[item]
         data = json.loads(line)
         features = data["text"]
         features = np.array([ord(c) for c in features], dtype="int64")
