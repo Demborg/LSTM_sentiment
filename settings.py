@@ -22,7 +22,7 @@ MODEL = {
     "num_layers": 1,
 }
 
-DATASET = datasets.YelpReviewsOneHotChars
+DATASET = datasets.YelpReviewsCharIdxes
 
 VISUALIZE = True
 CHECKPOINT_DIR = "checkpoints"
