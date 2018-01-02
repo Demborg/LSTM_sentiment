@@ -16,8 +16,10 @@ LEARNING_RATE = 0.001
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.SimpleLSTM,
+    "model": models.EmbeddingGRU,
+    "embedding_dim": 8,
     "hidden_size": 100,
+    "num_layers": 1,
 }
 
 DATASET = datasets.YelpReviewsOneHotChars
