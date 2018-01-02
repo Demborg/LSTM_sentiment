@@ -164,13 +164,16 @@ class EmbeddingGRU(nn.Module):
         self.char_embeddings = nn.Embedding(256, self.embedding_dim)
         self.gru = nn.GRU(input_size=self.embedding_dim, hidden_size=self.hidden_size, num_layers=self.num_layers)
         self.output_layer = nn.Linear(self.hidden_size, 4)
-        self.h0 = nn.Parameter(torch.randn(self.num_layers, 1, self.hidden_size))
+        #self.h0 = nn.Parameter(torch.randn(self.num_layers, 1, self.hidden_size))
+
+        self.float_tensor = torch.cuda.FloatTensor if settings.GPU else torch.FloatTensor
 
     def forward(self, padded, lengths):
         #padded, lengths = pad_packed_sequence(sequence, padding_value=0)
         embeds = self.char_embeddings(padded)
         sequence = pack_padded_sequence(embeds, lengths)
-        output, hn = self.gru(sequence, self.h0.expand(self.num_layers, len(lengths), self.hidden_size))
+        h0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
+        output, hn = self.gru(sequence, h0)
         predictions = self.output_layer(hn)
         return predictions
 
