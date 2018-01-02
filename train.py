@@ -12,9 +12,22 @@ import models
 import utils
 
 
+def my_collate(batch):
+    '''Collates list of samples to minibatch'''
+
+    batch = sorted(batch, key=lambda item: -len(item[0]))
+    features = [i[0] for i in batch]
+    targets = torch.stack([i[1] for i in batch])
+
+    features = utils.pack_sequence(features)
+
+    return features, targets
+
+
+
 # Instansiate dataset
 dataset = settings.DATASET(settings.args.data_path)
-data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
+data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE, shuffle=True, num_workers=1, collate_fn=my_collate)
 
 # Define model and optimizer
 model = utils.generate_model_from_settings()
@@ -38,20 +51,17 @@ for epoch in range(settings.EPOCHS):
     stars = np.zeros(len(dataset))
 
     # Main epoch loop
-    length = len(dataset)
+    length = len(dataset)/settings.BATCH_SIZE
     print("Starting epoch {} with length {}".format(epoch, length))
     for i, (feature, target) in enumerate(data_loader):
         if settings.GPU:
             feature = feature.cuda(async=True)
             target = target.cuda(async=True)
 
-        # Inference
-        feature = Variable(feature)
-        target = Variable(target)
         out = model(feature)
 
         # Loss computation and weight update step
-        loss = torch.mean((out[-1, 0] - target)**2)
+        loss = torch.mean((out - target)**2)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -71,5 +81,6 @@ for epoch in range(settings.EPOCHS):
     name = "{}_epoch{}.params".format(model.get_name(), epoch)
     utils.save_model_params(model, name)
     print("Saved model params as: {}".format(name))
+
 
 

@@ -3,6 +3,7 @@ import json
 import sys
 import numpy as np
 import filereader
+from torch.autograd import Variable
 
 
 from torch.utils.data import Dataset
@@ -26,7 +27,7 @@ class YelpReviewsOneHotChars(Dataset):
         keys = ["stars", "useful", "cool", "funny"]
         targets = np.array([float(data[i]) for i in keys], dtype='float32')
 
-        return torch.from_numpy(line_array), torch.from_numpy(targets)
+        return Variable(torch.from_numpy(line_array)), Variable(torch.from_numpy(targets))
 
 
 class YelpReviewsCharIdxes(Dataset):
@@ -47,7 +48,7 @@ class YelpReviewsCharIdxes(Dataset):
         keys = ["stars", "useful", "cool", "funny"]
         targets = np.array([float(data[i]) for i in keys], dtype='float32')
 
-        return torch.from_numpy(features), torch.from_numpy(targets)
+        return Variable(torch.from_numpy(features)), Variable(torch.from_numpy(targets))
 
 
 class RandomData(Dataset):
@@ -66,7 +67,7 @@ class RandomData(Dataset):
         return self.len
 
     def __getitem__(self, item):
-        return torch.randn(self.output_len, 256), torch.ones(4)
+        return Variable(torch.randn(self.output_len, 256)), Variable(torch.ones(4))
 
 
 if __name__ == "__main__":

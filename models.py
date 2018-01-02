@@ -5,6 +5,8 @@ from torch.autograd import Variable
 
 import settings
 
+from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
+
 
 class BaselineModel(nn.Module):
 
@@ -165,10 +167,11 @@ class EmbeddingGRU(nn.Module):
         self.h0 = nn.Parameter(torch.randn(self.num_layers, 1, self.hidden_size))
 
     def forward(self, sequence):
-        embeds = self.char_embeddings(sequence)
-        sequence = embeds.permute(1, 0, 2)
+        padded, lengths = pad_packed_sequence(sequence, padding_value=0)
+        embeds = self.char_embeddings(padded)
+        sequence = pack_padded_sequence(embeds, lengths)
         output, hn = self.gru(sequence, self.h0)
-        predictions = self.output_layer(output)
+        predictions = self.output_layer(hn)
         return predictions
 
     def get_name(self):
