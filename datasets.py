@@ -1,36 +1,31 @@
 import torch
 import json
 import sys
-import linecache
 import numpy as np
+from randomlineaccess import IndexedOpen
 
 from torch.utils.data import Dataset
 
 
 class YelpReviewsOneHotChars(Dataset):
     def __init__(self, path):
-        self.file = path
-        self.len = 0
-        print("Dataset: going through all reviews...")
-        with open(path) as f:
-            for line in f:
-                self.len += 1
-        linecache.lazycache(path, None)
-        print("Dataset: Is ready!")
+        print("Indexing dataset...")
+        self.file = IndexedOpen(path)
+        print("Indexing finished!")
 
     def __len__(self):
-        return self.len
+        return len(self.file)
 
     def __getitem__(self, item):
-        if item < 0 or item >= self.len:
+        if item < 0 or item >= len(self.file):
             raise IndexError("plz only positve and nice indices")
-        line = linecache.getline(self.file, item + 1)
+        line = self.file[item]
         data = json.loads(line)
         features = data["text"]
         features = [ord(c) for c in features]
         line_array = np.zeros([len(features), 256], dtype="float32")
         for i, j in enumerate(features):
-            line_array[i,j] = 1
+            line_array[i, j] = 1
         keys = ["stars", "useful", "cool", "funny"]
         targets = np.array([float(data[i]) for i in keys], dtype='float32')
 
@@ -42,22 +37,17 @@ class YelpReviewsCharIdxes(Dataset):
     Should be used together with models that learn their own embeddings.
     """
     def __init__(self, path):
-        self.file = path
-        self.len = 0
-        print("Dataset: going through all reviews...")
-        with open(path) as f:
-            for line in f:
-                self.len += 1
-        linecache.lazycache(path, None)
-        print("Dataset: Is ready!")
+        print("Indexing dataset...")
+        self.file = IndexedOpen(path)
+        print("Indexing finished!")
 
     def __len__(self):
-        return self.len
+        return len(self.file)
 
     def __getitem__(self, item):
-        if item < 0 or item >= self.len:
+        if item < 0 or item >= len(self.file):
             raise IndexError("plz only positve and nice indices")
-        line = linecache.getline(self.file, item + 1)
+        line = self.file[item]
         data = json.loads(line)
         features = data["text"]
         features = np.array([ord(c) for c in features], dtype="int64")
@@ -79,15 +69,20 @@ class RandomData(Dataset):
                 self.len += 1
         print("Dataset: Is ready!")
 
+        self.file = IndexedOpen(path)
+
     def __len__(self):
         return self.len
 
     def __getitem__(self, item):
         return torch.randn(self.output_len, 256), torch.ones(4)
 
+
 if __name__ == "__main__":
     dataset = YelpReviewsOneHotChars(sys.argv[1])
     print(len(dataset))
     print(dataset[1])
+    import code
+    code.interact(local=locals())
                 
 
