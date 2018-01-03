@@ -6,6 +6,7 @@ import datasets
 # Argument parsing
 parser = argparse.ArgumentParser(description="Sentiment analysis through Yelp reviews.")
 parser.add_argument('--enable-cuda', action='store_true', help='Enable CUDA')
+parser.add_argument('--visualize', action='store_true', help='Enable visdom visualization')
 parser.add_argument('--load-path', action='store', help='Path to checkpoint file for evaluation.')
 parser.add_argument('--data-path', action='store', help='Path to dataset.')
 parser.add_argument('--text', action='store', help='Text for live evaluation.')
@@ -29,7 +30,7 @@ DATA_KWARGS = {
     "glove_path": "glove.6B.50d.txt"
 }
 
-VISUALIZE = True
+VISUALIZE = args.visualize
 CHECKPOINT_DIR = "checkpoints"
 
 GPU = torch.cuda.is_available() and args.enable_cuda
