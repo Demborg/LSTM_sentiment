@@ -3,6 +3,7 @@ import json
 import sys
 import numpy as np
 import filereader
+import re
 from torch.autograd import Variable
 
 
@@ -45,6 +46,29 @@ class YelpReviewsCharIdxes(Dataset):
         data = json.loads(line)
         features = data["text"]
         features = np.array([ord(c) for c in features], dtype="int64")
+        keys = ["stars", "useful", "cool", "funny"]
+        targets = np.array([float(data[i]) for i in keys], dtype='float32')
+
+        return Variable(torch.from_numpy(features)), Variable(torch.from_numpy(targets))
+
+
+class YelpReviewsWordHash(Dataset):
+    """ Dataset built for loading yelp reviews into an indexed format.
+    Should be used together with models that learn their own embeddings.
+    """
+    def __init__(self, path):
+        self.reader = filereader.FileReader(path)
+        self.pattern = re.compile('[^ \w]+')
+
+    def __len__(self):
+        return len(self.reader)
+
+    def __getitem__(self, item):
+        line = self.reader[item]
+        data = json.loads(line)
+        features = data["text"]
+        features = self.pattern.sub('', features.lower())
+        features = np.array([hash(i) % 256 for i in features.split(" ")], dtype="int64")
         keys = ["stars", "useful", "cool", "funny"]
         targets = np.array([float(data[i]) for i in keys], dtype='float32')
 
