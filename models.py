@@ -49,10 +49,13 @@ class PureGRU(nn.Module):
 
         self.gru = nn.GRU(input_size=self.input_size, hidden_size=self.hidden_size, num_layers=self.num_layers)
         self.output_layer = nn.Linear(self.hidden_size, 4)
-        self.h0 = nn.Parameter(torch.randn(self.num_layers, 1, self.hidden_size))
+        #self.h0 = nn.Parameter(torch.randn(self.num_layers, 1, self.hidden_size))
+
+        self.float_tensor = torch.cuda.FloatTensor if settings.GPU else torch.FloatTensor
 
     def forward(self, padded, lengths):
         sequence = pack_padded_sequence(padded, lengths)
+        h0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
         output, hn = self.gru(sequence, self.h0)
         predictions = self.output_layer(hn)
         return predictions
