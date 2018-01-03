@@ -56,7 +56,7 @@ class PureGRU(nn.Module):
     def forward(self, padded, lengths):
         sequence = pack_padded_sequence(padded, lengths)
         h0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
-        output, hn = self.gru(sequence, self.h0)
+        output, hn = self.gru(sequence, h0)
         predictions = self.output_layer(hn)
         return predictions
 
