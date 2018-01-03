@@ -13,16 +13,21 @@ args = parser.parse_args()
 
 EPOCHS = 10
 LEARNING_RATE = 0.001
+BATCH_SIZE = 10
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.EmbeddingGRU,
-    "embedding_dim": 16,
-    "hidden_size": 256,
+    "model": models.SimpleLSTM,
+    "embedding_dim": 50,
+    "hidden_size": 128,
     "num_layers": 1,
+    "input_size": 50,
 }
 
-DATASET = datasets.YelpReviewsCharIdxes
+DATASET = datasets.GlovePretrained50d
+DATA_KWARGS = {
+    "glove_path": "glove.6B.50d.txt"
+}
 
 VISUALIZE = True
 CHECKPOINT_DIR = "checkpoints"

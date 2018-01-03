@@ -12,9 +12,23 @@ import models
 import utils
 
 
+def my_collate(batch):
+    '''Collates list of samples to minibatch'''
+
+    batch = sorted(batch, key=lambda item: -len(item[0]))
+    features = [i[0] for i in batch]
+    targets = torch.stack([i[1] for i in batch])
+
+    features = utils.pack_sequence(features)
+    features, lengths = torch.nn.utils.rnn.pad_packed_sequence(features, padding_value=0)
+
+    return features, lengths, targets
+
+
+
 # Instansiate dataset
-dataset = settings.DATASET(settings.args.data_path)
-data_loader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
+dataset = settings.DATASET(settings.args.data_path, **settings.DATA_KWARGS)
+data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE, shuffle=True, num_workers=1, collate_fn=my_collate)
 
 # Define model and optimizer
 model = utils.generate_model_from_settings()
@@ -38,26 +52,23 @@ for epoch in range(settings.EPOCHS):
     stars = np.zeros(len(dataset))
 
     # Main epoch loop
-    length = len(dataset)
+    length = len(dataset)/settings.BATCH_SIZE
     print("Starting epoch {} with length {}".format(epoch, length))
-    for i, (feature, target) in enumerate(data_loader):
+    for i, (feature, lengths, target) in enumerate(data_loader):
         if settings.GPU:
             feature = feature.cuda(async=True)
             target = target.cuda(async=True)
 
-        # Inference
-        feature = Variable(feature)
-        target = Variable(target)
-        out = model(feature)
+        out = model(feature, lengths)
 
         # Loss computation and weight update step
-        loss = torch.mean((out[-1, 0] - target)**2)
+        loss = torch.mean((out - target)**2)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
         # Visualization update
-        stars[i] = out[-1, 0, 0]
+        stars[i] = torch.mean(out[0, :, 0])
         viz.line(win=loss_plot, X=np.array([counter]), Y=loss.data.cpu().numpy(), update='append')
         counter += 1
 
@@ -71,5 +82,6 @@ for epoch in range(settings.EPOCHS):
     name = "{}_epoch{}.params".format(model.get_name(), epoch)
     utils.save_model_params(model, name)
     print("Saved model params as: {}".format(name))
+
 
 
