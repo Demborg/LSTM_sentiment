@@ -27,7 +27,7 @@ def my_collate(batch):
 
 
 # Instansiate dataset
-dataset = settings.DATASET(settings.args.data_path)
+dataset = settings.DATASET(settings.args.data_path, **settings.DATA_KWARGS)
 data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE, shuffle=True, num_workers=1, collate_fn=my_collate)
 
 # Define model and optimizer

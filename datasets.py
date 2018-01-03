@@ -5,9 +5,9 @@ import numpy as np
 import filereader
 import re
 from torch.autograd import Variable
-
-
 from torch.utils.data import Dataset
+
+import torchwordemb
 
 
 class YelpReviewsOneHotChars(Dataset):
@@ -73,6 +73,40 @@ class YelpReviewsWordHash(Dataset):
         targets = np.array([float(data[i]) for i in keys], dtype='float32')
 
         return Variable(torch.from_numpy(features)), Variable(torch.from_numpy(targets))
+
+
+class GlovePretrained50d(Dataset):
+    """ Dataset that converts the sentences using pretrained 50-dimensional glove word vectors.
+    """
+
+    def __init__(self, path, glove_path="./glove.6B.50d.txt"):
+        self.reader = filereader.FileReader(path)
+        self.pattern = re.compile('[^ \w]+')
+        print("Reading word vectors...")
+        self.vocab, self.vec = torchwordemb.load_glove_text(glove_path)
+        print("Done!")
+
+    def __len__(self):
+        return len(self.reader)
+
+    def __getitem__(self, item):
+        line = self.reader[item]
+        data = json.loads(line)
+        features = data["text"]
+        features = self.pattern.sub('', features.lower())
+
+        remapped = []
+        for word in features.split(" "):
+            if word in self.vocab:
+                remapped.append(self.vec[self.vocab[word]])
+            else:
+                remapped.append(torch.zeros(50))
+        features = torch.stack(remapped)
+
+        keys = ["stars", "useful", "cool", "funny"]
+        targets = np.array([float(data[i]) for i in keys], dtype='float32')
+
+        return Variable(features), Variable(torch.from_numpy(targets))
 
 
 class RandomData(Dataset):

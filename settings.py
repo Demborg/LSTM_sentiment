@@ -17,13 +17,17 @@ BATCH_SIZE = 10
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.EmbeddingGRU,
+    "model": models.PureGRU,
     "embedding_dim": 50,
     "hidden_size": 128,
     "num_layers": 1,
+    "input_size": 50,
 }
 
-DATASET = datasets.YelpReviewsWordHash
+DATASET = datasets.GlovePretrained50d
+DATA_KWARGS = {
+    "glove_path": "glove.6B.50d.txt"
+}
 
 VISUALIZE = True
 CHECKPOINT_DIR = "checkpoints"
