@@ -69,7 +69,7 @@ for epoch in range(settings.EPOCHS):
         out = model(feature, lengths)
 
         # Loss computation and weight update step
-        loss = torch.mean((out - target)**2)
+        loss = torch.mean((out[0, :, 0] - target[:, 0])**2)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
