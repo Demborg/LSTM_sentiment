@@ -6,9 +6,7 @@ from torch.autograd import Variable
 from visdom import Visdom
 import numpy as np
 
-import datasets
 import settings
-import models
 import utils
 
 
@@ -25,7 +23,6 @@ def my_collate(batch):
     return features, lengths, targets
 
 
-
 # Instansiate dataset
 dataset = settings.DATASET(settings.args.data_path, **settings.DATA_KWARGS)
 data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE, shuffle=True, num_workers=1, collate_fn=my_collate)
@@ -33,6 +30,9 @@ data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE, shuffle=True, 
 # Define model and optimizer
 model = utils.generate_model_from_settings()
 optimizer = torch.optim.Adam(model.parameters(), lr=settings.LEARNING_RATE)
+
+# Log file is namespaced with the current model
+log_file = "logs/{}_{}.csv".format(model.get_name(), settings.args.data_path.split("/")[-1].split(".json")[0])
 
 if settings.VISUALIZE:
     # Visualization thorugh visdom
@@ -73,6 +73,10 @@ for epoch in range(settings.EPOCHS):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        # Log loss
+        with open(log_file, 'a') as logfile:
+            logfile.write("{},".format(float(loss)))
 
         # Visualization update
         if settings.VISUALIZE:
