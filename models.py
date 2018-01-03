@@ -18,19 +18,23 @@ class BaselineModel(nn.Module):
         super().__init__()
         self.hidden_size = kwargs["hidden_size"]
         self.input_size = kwargs["input_size"]
+        self.num_layers = kwargs["num_layers"]
 
-        self.rnn = nn.RNN(input_size=self.input_size, hidden_size=self.hidden_size, num_layers=1)
+        self.rnn = nn.RNN(input_size=self.input_size, hidden_size=self.hidden_size, num_layers=self.num_layers)
         self.output_layer = nn.Linear(self.hidden_size, 4)
-        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
+        #self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
 
-    def forward(self, sequence):
-        sequence = sequence.permute(1, 0, 2)
-        output, hn = self.rnn(sequence, self.h0)
-        predictions = self.output_layer(output)
+        self.float_tensor = torch.cuda.FloatTensor if settings.GPU else torch.FloatTensor
+
+    def forward(self, padded, lengths):
+        sequence = pack_padded_sequence(padded, lengths)
+        h0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
+        output, hn = self.rnn(sequence, h0)
+        predictions = self.output_layer(hn)
         return predictions
 
     def get_name(self):
-        return "BaseLine_h{}_i{}".format(self.hidden_size, self.input_size)
+        return "BaseLine_h{}_l{}_i{}".format(self.hidden_size, self.num_layers, self.input_size)
 
 
 class PureGRU(nn.Module):
@@ -74,20 +78,25 @@ class SimpleLSTM(nn.Module):
         super().__init__()
         self.hidden_size = kwargs["hidden_size"]
         self.input_size = kwargs["input_size"]
+        self.num_layers = kwargs["num_layers"]
 
-        self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=self.hidden_size, num_layers=1)
+        self.lstm = nn.LSTM(input_size=self.input_size, hidden_size=self.hidden_size, num_layers=self.num_layers)
         self.output_layer = nn.Linear(self.hidden_size, 4)
-        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
-        self.c0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
+        #self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
+        #self.c0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
 
-    def forward(self, sequence):
-        sequence = sequence.permute(1, 0, 2)
-        output, hn = self.lstm(sequence, (self.h0, self.c0))
-        predictions = self.output_layer(output)
+        self.float_tensor = torch.cuda.FloatTensor if settings.GPU else torch.FloatTensor
+
+    def forward(self, padded, lengths):
+        sequence = pack_padded_sequence(padded, lengths)
+        h0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
+        c0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
+        output, (hn, cn) = self.lstm(sequence, (h0, c0))
+        predictions = self.output_layer(hn)
         return predictions
 
     def get_name(self):
-        return "SimpleLSTM_{}".format(self.hidden_size)
+        return "SimpleLSTM_h{}_l{}_i{}".format(self.hidden_size, self.num_layers, self.input_size)
 
 
 class EmbeddingLSTM(nn.Module):

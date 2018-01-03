@@ -17,7 +17,7 @@ BATCH_SIZE = 10
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.PureGRU,
+    "model": models.SimpleLSTM,
     "embedding_dim": 50,
     "hidden_size": 128,
     "num_layers": 1,
