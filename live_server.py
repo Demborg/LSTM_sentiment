@@ -1,12 +1,22 @@
 import torch
-
 import utils
 import settings
 import torchwordemb
-
 from live_sentiment import text2vec
 
-import socket
+import socketserver
+
+
+class ConnectionHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        text = self.request.recv(1024).decode("utf-8")
+        features = text2vec(text, vocab, vec)
+        features = utils.pack_sequence([features])
+        (features, lengths) = torch.nn.utils.rnn.pad_packed_sequence(features)
+        out = model(features, lengths)
+
+        stars = "{}".format(float(out[0, 0, 0])).encode("utf-8")
+        self.request.sendall(stars)
 
 
 if __name__ == "__main__":
@@ -20,18 +30,6 @@ if __name__ == "__main__":
     print("Done!")
 
     # Start listening for connections
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("localhost", 8098))
-    s.listen(1)
-    conn, addr = s.accept()
-    print("Connection established")
-
-    while True:
-        text = conn.recv(1024).decode("utf-8")
-        features = text2vec(text, vocab, vec)
-        features = utils.pack_sequence([features])
-        (features, lengths) = torch.nn.utils.rnn.pad_packed_sequence(features)
-        out = model(features, lengths)
-
-        stars = "{}".format(float(out[0, 0, 0])).encode("utf-8")
-        conn.send(stars)
+    port = int(settings.args.port)
+    server = socketserver.TCPServer(("localhost", port), ConnectionHandler)
+    server.serve_forever()
