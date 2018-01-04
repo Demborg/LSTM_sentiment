@@ -1,31 +1,17 @@
 import sys
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from torch.autograd import Variable
 from visdom import Visdom
-import numpy as np
 
 import settings
 import utils
 
-
-def my_collate(batch):
-    '''Collates list of samples to minibatch'''
-
-    batch = sorted(batch, key=lambda item: -len(item[0]))
-    features = [i[0] for i in batch]
-    targets = torch.stack([i[1] for i in batch])
-
-    features = utils.pack_sequence(features)
-    features, lengths = torch.nn.utils.rnn.pad_packed_sequence(features, padding_value=0)
-
-    return features, lengths, targets
-
-
 # Instansiate dataset
 dataset = settings.DATASET(settings.args.data_path, **settings.DATA_KWARGS)
-data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE, shuffle=True, num_workers=1, collate_fn=my_collate)
+data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE,
+                         shuffle=True, num_workers=4, collate_fn=utils.collate_to_packed)
 
 # Define model and optimizer
 model = utils.generate_model_from_settings()

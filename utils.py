@@ -94,3 +94,16 @@ def pack_sequence(sequences):
         a :class:`PackedSequence` object
     """
     return torch.nn.utils.rnn.pack_padded_sequence(pad_sequence(sequences), [v.size(0) for v in sequences])
+
+
+def collate_to_packed(batch):
+    '''Collates list of samples to minibatch'''
+
+    batch = sorted(batch, key=lambda item: -len(item[0]))
+    features = [i[0] for i in batch]
+    targets = torch.stack([i[1] for i in batch])
+
+    features = pack_sequence(features)
+    features, lengths = torch.nn.utils.rnn.pad_packed_sequence(features, padding_value=0)
+
+    return features, lengths, targets
