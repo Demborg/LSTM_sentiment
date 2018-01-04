@@ -21,16 +21,17 @@ if __name__ == "__main__":
 
     # Start listening for connections
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("localhost", "8090"))
+    s.bind(("localhost", 8098))
     s.listen(1)
+    conn, addr = s.accept()
+    print("Connection established")
+
     while True:
-        text = input("What's on your mind? \n")
+        text = conn.recv(1024).decode("utf-8")
         features = text2vec(text, vocab, vec)
         features = utils.pack_sequence([features])
         (features, lengths) = torch.nn.utils.rnn.pad_packed_sequence(features)
         out = model(features, lengths)
 
-        stars = float(out[0, 0, 0])
-        if stars < 1.1:
-            print("Watch your language, kid.")
-        print("Your mind has the following rating: {}".format(stars))
+        stars = "{}".format(float(out[0, 0, 0])).encode("utf-8")
+        conn.send(stars)
