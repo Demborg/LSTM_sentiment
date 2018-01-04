@@ -22,15 +22,29 @@ data_loader = DataLoader(dataset, batch_size=settings.BATCH_SIZE,
 model = utils.generate_model_from_settings()
 utils.load_model_params(model, settings.args.load_path)
 
+# Move stuff to GPU
+if settings.GPU:
+    data_loader.pin_memory = True
+    model.cuda()
 
 losses = np.zeros(len(dataset))
+length = len(dataset)
+
+print("Starting evaluation with length {}".format(length))
 for i, (feature, lengths, target) in enumerate(data_loader):
+    if settings.GPU:
+        feature = feature.cuda(async=True)
+        target = target.cuda(async=True)
+
     # Inference
     out = model(feature, lengths)
 
     # Loss computation and weight update step
     loss = torch.mean((out[-1, :, 0] - target[:, 0])**2)
     losses[i] = loss
+
+    if i % 10 == 0:
+        sys.stdout.write("\rIter {}/{}, loss: {}".format(i, length, float(loss)))
 
 print("Average loss was: {}".format(np.mean(losses)))
 
