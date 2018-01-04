@@ -12,7 +12,7 @@ parser.add_argument('--data-path', action='store', help='Path to dataset.')
 parser.add_argument('--text', action='store', help='Text for live evaluation.')
 args = parser.parse_args()
 
-EPOCHS = 1
+EPOCHS = 10
 LEARNING_RATE = 0.001
 BATCH_SIZE = 100
 GPU = torch.cuda.is_available()
