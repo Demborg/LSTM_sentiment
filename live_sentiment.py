@@ -1,14 +1,13 @@
-import sys
-
 import torch
 from torch.autograd import Variable
-import numpy as np
+# import numpy as np
 
 import utils
 import settings
-from colored import fg, bg, stylize
+# from colored import fg, bg, stylize
 import re
 import torchwordemb
+
 
 def rating_to_color(rating):
     """Takes a rating from 0 to 5 and converts that to a grey scale x-term
@@ -17,6 +16,7 @@ def rating_to_color(rating):
     val = int(rating/5. * 23 + 232)
     val = max(0, min(255, val))
     return val
+
 
 def text2vec(text,vocab,vec):
     pattern = re.compile('[^ \w]+')
@@ -34,16 +34,16 @@ def text2vec(text,vocab,vec):
 
 
 if __name__ == "__main__":
-    # load model
+    # Load model
     model = utils.generate_model_from_settings()
     utils.load_model_params(model, settings.args.load_path)
 
-    #load glove
+    # Load glove
     print("Reading word vectors...")
     vocab, vec = torchwordemb.load_glove_text(settings.DATA_KWARGS["glove_path"])
     print("Done!")
 
-    #extract features from string
+    # Extract features from string
     features = text2vec(settings.args.text, vocab, vec)
     features = utils.pack_sequence([features])
     (features, lengths) = torch.nn.utils.rnn.pad_packed_sequence(features)
