@@ -28,7 +28,6 @@ if __name__ == "__main__":
 
         stars = float(out[0, 0, 0])
         if stars < 1.1:
-            print("Watch your language, kid. I've never heard so many foul words in one sentence. I quit!")
-            break
+            print("Watch your language, kid")
         print("Your mind has the following rating: {}".format(stars))
 
