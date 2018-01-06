@@ -1,23 +1,12 @@
-import sys
-
 import torch
 from torch.autograd import Variable
-import numpy as np
+# import numpy as np
 
 import utils
 import settings
-from colored import fg, bg, stylize 
-
-
-def get_live_sentiment(model, feature):
-    """Takes a trained model and a list of features and returns the
-    estimated scores for each timestep"""
-
-    # Inference
-    feature = Variable(feature.permute(1, 0, 2))
-    out = model(feature)
-
-    return(out)
+# from colored import fg, bg, stylize
+import re
+import torchwordemb
 
 
 def rating_to_color(rating):
@@ -29,23 +18,41 @@ def rating_to_color(rating):
     return val
 
 
+def text2vec(text,vocab,vec):
+    pattern = re.compile('[^ \w]+')
+    features = pattern.sub('', text.lower())
+
+    remapped = []
+    for word in features.split(" "):
+        if word in vocab:
+            remapped.append(vec[vocab[word]])
+        else:
+            remapped.append(torch.zeros(50))
+    features = torch.stack(remapped)
+
+    return Variable(features)
+
+
 if __name__ == "__main__":
-    # load model
+    # Load model
     model = utils.generate_model_from_settings()
     utils.load_model_params(model, settings.args.load_path)
 
-    #extract features from string
-    features = [ord(c) for c in settings.args.text]
-    line_array = np.zeros([1, len(features), 256], dtype="float32")
+    # Load glove
+    print("Reading word vectors...")
+    vocab, vec = torchwordemb.load_glove_text(settings.DATA_KWARGS["glove_path"])
+    print("Done!")
 
-    for i, j in enumerate(features):
-        line_array[0, i, j] = 1
+    # Extract features from string
+    features = text2vec(settings.args.text, vocab, vec)
+    features = utils.pack_sequence([features])
+    (features, lengths) = torch.nn.utils.rnn.pad_packed_sequence(features)
+    out = model(features, lengths)
 
-    line_array = torch.from_numpy(line_array)
-    # print(line_array)
+    stars = float(out[0, 0, 0])
+    print(stars)
 
-    out = get_live_sentiment(model, line_array)
-
+'''
     #Color stuff
     font_color = fg("#0000ff")
 
@@ -61,6 +68,5 @@ if __name__ == "__main__":
         style = bg(rating_to_color(out[i, 0, 0])) + font_color
 
         print(stylize(c, style), end='')
-
-    print()
+'''
 
