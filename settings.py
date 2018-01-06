@@ -11,6 +11,7 @@ parser.add_argument('--load-path', action='store', help='Path to checkpoint file
 parser.add_argument('--data-path', action='store', help='Path to dataset.')
 parser.add_argument('--text', action='store', help='Text for live evaluation.')
 parser.add_argument('--port', action='store', help='Port when using live evaluation server')
+parser.add_argument('--host', action='store', help='Host when using live evaluation server')
 args = parser.parse_args()
 
 EPOCHS = 10

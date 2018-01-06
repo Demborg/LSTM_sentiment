@@ -31,5 +31,6 @@ if __name__ == "__main__":
 
     # Start listening for connections
     port = int(settings.args.port)
-    server = socketserver.TCPServer(("localhost", port), ConnectionHandler)
+    host = settings.args.host
+    server = socketserver.TCPServer((host, port), ConnectionHandler)
     server.serve_forever()
