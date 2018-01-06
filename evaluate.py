@@ -27,8 +27,8 @@ if settings.GPU:
     data_loader.pin_memory = True
     model.cuda()
 
-losses = np.zeros(len(dataset))
 length = len(dataset)
+losses = []
 
 print("Starting evaluation with length {}".format(length))
 for i, (feature, lengths, target) in enumerate(data_loader):
@@ -41,11 +41,12 @@ for i, (feature, lengths, target) in enumerate(data_loader):
 
     # Loss computation and weight update step
     loss = torch.mean((out[-1, :, 0] - target[:, 0])**2)
-    losses[i] = loss
+    losses.append(float(loss))
 
     if i % 10 == 0:
         sys.stdout.write("\rIter {}/{}, loss: {}".format(i, length, float(loss)))
 
+print()
 print("Average loss was: {}".format(np.mean(losses)))
 
 
