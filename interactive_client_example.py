@@ -4,7 +4,7 @@ import socket
 import settings
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("localhost", int(settings.args.port)))
+s.connect((settings.args.host, int(settings.args.port)))
 
 text = input("Give me some text, and I'll send it for you baby. \n")
 s.send(text.encode("utf-8"))
