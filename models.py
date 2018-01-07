@@ -128,6 +128,7 @@ class EmbeddingLSTM(nn.Module):
         return predictions
 
     def get_name(self):
+        return "EmbeddingLSTM_h{}_l{}_i{}_e{}".format(self.hidden_size, self.num_layers, self.input_size, self.embedding_dim)
 
 
 class EmbeddingBaselineModel(nn.Module):
@@ -194,6 +195,7 @@ class EmbeddingGRU(nn.Module):
     def get_name(self):
         return "EmbeddingGRU_h{}_l{}_e{}".format(self.hidden_size, self.num_layers, self.embedding_dim)
 
+
 class ConvLSTM(nn.Module):
 
     def __init__(self, **kwargs):
@@ -209,37 +211,41 @@ class ConvLSTM(nn.Module):
         super().__init__()
         self.num_layers = kwargs["num_layers"]
         self.hidden_size = kwargs["hidden_size"]
+        self.input_size = kwargs["input_size"]
         self.embedding_dim = kwargs["embedding_dim"]
         self.kernel_size = kwargs["kernel_size"]
-        self.kernel_nb = kwargs["kernel_nb"]
-        self.batch_size = kwargs["batch_size"]
+        self.cnn_padding = (self.kernel_size - 1) / 2
+        self.intermediate_size = kwargs["kernel_nb"]
         self.dropout = kwargs["dropout"]
         self.char_embeddings = nn.Embedding(256, self.embedding_dim)
+
+        # Only accept odd kernel sizes
+        if self.kernel_size % 2 == 0:
+            raise AttributeError("Only odd kernel sizes accepted for CNN-LSTM")
      
-     #CNN
-        self.conv = nn.Conv2d(1, self.kernel_nb, (self.kernel_size, 256))
+        # CNN
+        #self.conv = nn.Conv2d(1, self.kernel_nb, (self.kernel_size, 256))
+        self.conv = nn.Conv1d(self.input_size, self.intermediate_size, self.kernel_size, padding=self.cnn_padding)
+        self.conv_actiation = F.relu
         self.dropout = nn.Dropout(self.dropout)
 
-     #LSTM
-        self.lstm = nn.LSTM(self.embedding_dim, hidden_size=self.hidden_size, num_layers=self.num_layers)
+        # LSTM
+        self.lstm = nn.LSTM(self.intermediate_size, hidden_size=self.hidden_size, num_layers=self.num_layers)
         self.output_layer = nn.Linear(self.hidden_size, 4)
-        self.h0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
-        self.c0 = nn.Parameter(torch.randn(1, 1, self.hidden_size))
 
-    def forward(self, sequence):
-        embeds = self.char_embeddings(sequence)
+        self.float_tensor = torch.cuda.FloatTensor if settings.GPU else torch.FloatTensor
+
+    def forward(self, padded, lengths):
         #CNN
-        cnn_x = self.conv(embeds.permute(1,0,2).unsqueeze(1))
-        cnn_out = self.dropout(cnn_x)
+        intermediate = self.dropout(self.conv_actiation(self.conv(padded)))
         #LSTM
-        lstm_x, hn = self.lstm(embeds.permute(1, 0, 2), (self.h0, self.c0))
-        lstm_out = self.output_layer(lstm_x)
-
-        #CNN_LSTM
-        cnn_lstm_out = torch.cat((cnn_x, lstm_out), 0)
-        cnn_lstm_out = torch.transpose(cnn_lstm_out, 0, 1)
-        return cnn_lstm_out
+        sequence = pack_padded_sequence(intermediate, lengths)
+        h0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
+        c0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
+        output, (hn, cn) = self.lstm(sequence, (h0, c0))
+        predictions = self.output_layer(hn)
+        return predictions
 
     def get_name(self):
-        return "ConvLSTM_h{}_l{}".format(self.hidden_size, self.num_layers)
+        return "ConvLSTM_h{}_l{}_i{}_int{}".format(self.hidden_size, self.num_layers, self.input_size, self.intermediate_size)
 

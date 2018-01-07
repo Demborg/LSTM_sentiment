@@ -23,12 +23,11 @@ MODEL = {
     "model": models.ConvLSTM,
     "embedding_dim": 50,
     "input_size": 50,
-    "hidden_size": 128,
+    "hidden_size": 64,
     "num_layers": 1,
-    "kernel_size": 1,
-    "kernel_nb": 200,
-    "batch_size": 1,
-    "dropout": 0.4
+    "kernel_size": 5,
+    "intermediate_size": 32,
+    "dropout": 0.0,
 }
 
 DATASET = datasets.GlovePretrained50d
