@@ -214,8 +214,8 @@ class ConvLSTM(nn.Module):
         self.input_size = kwargs["input_size"]
         self.embedding_dim = kwargs["embedding_dim"]
         self.kernel_size = kwargs["kernel_size"]
-        self.cnn_padding = (self.kernel_size - 1) / 2
-        self.intermediate_size = kwargs["kernel_nb"]
+        self.cnn_padding = int((self.kernel_size - 1) / 2)
+        self.intermediate_size = kwargs["intermediate_size"]
         self.dropout = kwargs["dropout"]
         self.char_embeddings = nn.Embedding(256, self.embedding_dim)
 
@@ -237,7 +237,9 @@ class ConvLSTM(nn.Module):
 
     def forward(self, padded, lengths):
         #CNN
-        intermediate = self.dropout(self.conv_actiation(self.conv(padded)))
+        permuted = padded.permute(1, 2, 0)
+        intermediate = self.dropout(self.conv_actiation(self.conv(permuted)))
+        intermediate = intermediate.permute(2, 0, 1)
         #LSTM
         sequence = pack_padded_sequence(intermediate, lengths)
         h0 = Variable(self.float_tensor(self.num_layers, len(lengths), self.hidden_size).fill_(0.))
