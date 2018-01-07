@@ -20,11 +20,15 @@ BATCH_SIZE = 100
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.PureGRU,
+    "model": models.ConvLSTM,
     "embedding_dim": 50,
-    "hidden_size": 32,
-    "num_layers": 3,
     "input_size": 50,
+    "hidden_size": 128,
+    "num_layers": 1,
+    "kernel_size": 1,
+    "kernel_nb": 200,
+    "batch_size": 1,
+    "dropout": 0.4
 }
 
 DATASET = datasets.GlovePretrained50d
