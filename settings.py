@@ -20,10 +20,10 @@ BATCH_SIZE = 100
 GPU = torch.cuda.is_available()
 
 MODEL = {
-    "model": models.ConvLSTM,
+    "model": models.PureGRU,
     "embedding_dim": 50,
     "input_size": 50,
-    "hidden_size": 64,
+    "hidden_size": 128,
     "num_layers": 1,
     "kernel_size": 5,
     "intermediate_size": 32,

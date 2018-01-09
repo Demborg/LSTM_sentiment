@@ -9,3 +9,4 @@ checkpoints
 glove*
 usable_models*
 logs*
+*.pyc
