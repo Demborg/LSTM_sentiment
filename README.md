@@ -1,4 +1,5 @@
-# LSTM sentiment analysis on the Yelp-dataset
+# LSTM sentiment analysis on the Yelp-dataset 
+[report](report.pdf)
 
 This project does sentiment analysis on the [yelp-review](https://www.yelp.com/dataset) dataset. This is done by modeling the star rating and the number of votes for the review being _cool_, _funny_ and _helpful_ as a function of the written text in the review.
 
@@ -33,4 +34,3 @@ Then evaluation should be performed through:
 ```
 python evaluate.py --load-path PATH_TO_CHECKPOINT_OF_MODEL --data-path PATH_TO_EVAL_DATA
 ```
-
