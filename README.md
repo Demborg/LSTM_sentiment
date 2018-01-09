@@ -24,6 +24,7 @@ When the setting have been set properly training a model should be as easy as
 ```
 python train.py --data-path PATH_TO_TRAIN_DATA
 ```
+It is important to keep in mind that one has to provide own word-embeddings if one wishes to train models with external word embeddings.
 
 ## Evaluating model on new data
 To evaluate a trained model on new data start by making sure that the model and dataset type in the settings script are the same as the one you want to evaluate.
@@ -32,7 +33,4 @@ Then evaluation should be performed through:
 ```
 python evaluate.py --load-path PATH_TO_CHECKPOINT_OF_MODEL --data-path PATH_TO_EVAL_DATA
 ```
-
-## Additional potentially useful resources
-Pre-trained word embeddings for PyTorch: https://github.com/iamalbert/pytorch-wordemb
 
