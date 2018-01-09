@@ -33,6 +33,3 @@ Then evaluation should be performed through:
 python evaluate.py --load-path PATH_TO_CHECKPOINT_OF_MODEL --data-path PATH_TO_EVAL_DATA
 ```
 
-## Additional potentially useful resources
-Pre-trained word embeddings for PyTorch: https://github.com/iamalbert/pytorch-wordemb
-
